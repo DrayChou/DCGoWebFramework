@@ -88,7 +88,7 @@ func handler(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	docgowebframework.test()
+	docgowebframework.test.test()
 
 	fmt.Println("WARNING: This is an example, but not really safe.")
 	http.HandleFunc("/", handler)
