@@ -8,7 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"./docgowebframework"
+	"./controller"
+	"./lib"
 )
 
 func Log(handler http.Handler) http.Handler {
@@ -34,22 +35,15 @@ func filename(name string) string {
 }
 
 func get(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("Query: ", req.URL.Query())
-	fmt.Println("Path: ", req.URL.Path)
-	fmt.Println("RawPath: ", req.URL.RawPath)
-
-	fmt.Println("get2: ", req.URL.Query().Get("name"))
-	fmt.Println("get3: ", req.Form)
-	fmt.Println("get4: ", req.Form.Get("name"))
 
 	// Example of fetching specific Query Param.
 	name := filename(req.Form.Get("name"))
 	body, err := ioutil.ReadFile(name)
 
-	if err == nil {
-		fmt.Fprintf(res, string(body[:]))
-	} else {
+	if err != nil {
 		fmt.Fprintf(res, "Error: ", err)
+	} else {
+		fmt.Fprintf(res, string(body[:]))
 	}
 }
 
@@ -73,8 +67,18 @@ func bad(res http.ResponseWriter, req *http.Request) {
 
 func handler(res http.ResponseWriter, req *http.Request) {
 	// Example of parsing GET or POST Query Params.
-	req.ParseForm()
+	path := req.URL.Path
+	fmt.Println("Path: ", path)
 
+	name_c := strings.Split(path, ",")
+
+	fmt.Println("name_c: ", name_c)
+
+	fmt.Println("Query: ", req.URL.Query())
+	fmt.Println("Path: ", req.URL.Path)
+	fmt.Println("RawPath: ", req.URL.RawPath)
+
+	req.ParseForm()
 	// Example of handling POST request.
 	switch req.Method {
 	case "POST":
@@ -87,10 +91,16 @@ func handler(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func faviconHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "relative/path/to/favicon.ico")
+}
+
 func main() {
-	docgowebframework.test.test()
+	controller.Index()
+	lib.Tools()
 
 	fmt.Println("WARNING: This is an example, but not really safe.")
 	http.HandleFunc("/", handler)
+	http.HandleFunc("/favicon.ico", faviconHandler)
 	http.ListenAndServe(":8888", Log(http.DefaultServeMux))
 }
