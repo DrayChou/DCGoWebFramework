@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"./docgowebframework"
 )
 
 func Log(handler http.Handler) http.Handler {
@@ -32,14 +34,19 @@ func filename(name string) string {
 }
 
 func get(res http.ResponseWriter, req *http.Request) {
-	fmt.Println("res: ", res)
-	fmt.Println("URL: ", req.URL.Query())
-	fmt.Println("RequestURI: ", req.RequestURI)
-	fmt.Println("RequestURI: ", req.RequestURI)
+	fmt.Println("Query: ", req.URL.Query())
+	fmt.Println("Path: ", req.URL.Path)
+	fmt.Println("RawPath: ", req.URL.RawPath)
+
+	fmt.Println("get2: ", req.URL.Query().Get("name"))
+	fmt.Println("get3: ", req.Form)
+	fmt.Println("get4: ", req.Form.Get("name"))
+
 	// Example of fetching specific Query Param.
 	name := filename(req.Form.Get("name"))
 	body, err := ioutil.ReadFile(name)
-	if err != nil {
+
+	if err == nil {
 		fmt.Fprintf(res, string(body[:]))
 	} else {
 		fmt.Fprintf(res, "Error: ", err)
@@ -81,6 +88,8 @@ func handler(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	docgowebframework.test()
+
 	fmt.Println("WARNING: This is an example, but not really safe.")
 	http.HandleFunc("/", handler)
 	http.ListenAndServe(":8888", Log(http.DefaultServeMux))
