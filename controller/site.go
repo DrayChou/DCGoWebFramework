@@ -6,10 +6,10 @@ import (
 	"../app"
 )
 
-type IndexController struct {
+type SiteController struct {
 	app.Controller
 }
 
-func (p IndexController) Index() {
+func (p SiteController) Index() {
 	fmt.Fprint(p.Response, p.Request.RequestURI)
 }
