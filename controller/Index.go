@@ -11,5 +11,6 @@ type IndexController struct {
 }
 
 func (p IndexController) Index() {
-	fmt.Fprint(p.Response, p.Request.RequestURI)
+	fmt.Fprintln(p.Response, p.Request.RequestURI)
+	fmt.Fprintln(p.Response, "index.index")
 }

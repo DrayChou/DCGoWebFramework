@@ -11,5 +11,6 @@ type SiteController struct {
 }
 
 func (p SiteController) Index() {
-	fmt.Fprint(p.Response, p.Request.RequestURI)
+	fmt.Fprintln(p.Response, p.Request.RequestURI)
+	fmt.Fprintln(p.Response, "site.index")
 }

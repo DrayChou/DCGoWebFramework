@@ -18,28 +18,40 @@ func New() *application {
 }
 
 func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	controllerName := r.URL.Query().Get("c")
-	actionName := r.URL.Query().Get("a")
-	if controllerName == "" {
-		controllerName = "index"
+	controllerName := "index"
+	actionName := "Index"
+	path := strings.Split(r.URL.Path, "/")
+	fmt.Println("path:", path)
+	if len(path) >= 2 {
+		controllerName = strings.ToLower(path[1])
 	}
-	if actionName == "" {
-		actionName = "index"
+	if len(path) >= 3 {
+		actionName = strings.Title(path[2])
 	}
-
-	controllerName = strings.ToLower(controllerName)
-	actionName = strings.Title(actionName)
 	fmt.Printf("%s %s\n", controllerName, actionName)
+
+	if controllerName == "static" {
+		//匹配静态文件服务
+		fmt.Println("static %s was found", r.URL.Path)
+		http.FileServer(http.Dir("../static"))
+		return
+	}
 
 	route, ok := p.routes[controllerName]
 	if !ok {
 		http.Error(w, "Controller Not Found", http.StatusNotFound)
 		return
 	}
-	ele := reflect.ValueOf(route).Elem()
-	ele.FieldByName("Request").Set(reflect.ValueOf(r))
-	ele.FieldByName("Response").Set(reflect.ValueOf(w))
-	ele.MethodByName(actionName).Call([]reflect.Value{})
+
+	_, exist := reflect.TypeOf(route).MethodByName(actionName)
+	if exist {
+		ele := reflect.ValueOf(route).Elem()
+		ele.FieldByName("Request").Set(reflect.ValueOf(r))
+		ele.FieldByName("Response").Set(reflect.ValueOf(w))
+		ele.MethodByName(actionName).Call([]reflect.Value{})
+	} else {
+		fmt.Fprintf(w, "method %s not found", r.URL.Path)
+	}
 }
 
 func (p *application) printRoutes() {
@@ -56,5 +68,8 @@ func (p *application) Get(route string, controller interface{}) {
 func (p *application) Run(addr string) error {
 	p.printRoutes()
 	fmt.Printf("listen on %s\n", addr)
+
+	http.Handle("/static/", http.FileServer(http.Dir("../static")))
+
 	return http.ListenAndServe(addr, p)
 }
