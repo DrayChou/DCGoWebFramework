@@ -1,4 +1,4 @@
-package app
+package DCGoWebFramework
 
 import (
 	"fmt"
@@ -18,9 +18,15 @@ func New() *application {
 }
 
 func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	upath := r.URL.Path
+	if !strings.HasPrefix(upath, "/") {
+		upath = "/" + upath
+		r.URL.Path = upath
+	}
+
 	controllerName := "index"
 	actionName := "Index"
-	path := strings.Split(r.URL.Path, "/")
+	path := strings.Split(upath, "/")
 	fmt.Println("path:", path)
 	if len(path) >= 2 {
 		controllerName = strings.ToLower(path[1])
@@ -30,10 +36,26 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Printf("%s %s\n", controllerName, actionName)
 
+	if controllerName == "favicon.ico" {
+		//匹配静态文件服务
+		fmt.Println("static 001", upath)
+		fmt.Println("static 002", http.Dir("../static/favicon.ico"))
+		fmt.Println("static 003", http.FileServer(http.Dir("../static/favicon.ico")))
+
+		//		http.Handle("/static/favicon.ico", http.StripPrefix("/static/favicon.ico", http.FileServer(http.Dir("../static/favicon.ico"))))
+		http.StripPrefix("/static/favicon.ico", http.FileServer(http.Dir("../static/favicon.ico")))
+		return
+	}
+
 	if controllerName == "static" {
 		//匹配静态文件服务
-		fmt.Println("static %s was found", r.URL.Path)
-		http.FileServer(http.Dir("../static"))
+		fmt.Println("static %s was found", upath)
+		fmt.Println("static 001", upath)
+		fmt.Println("static 002", http.Dir("../static/favicon.ico"))
+		fmt.Println("static 003", http.FileServer(http.Dir("../static/favicon.ico")))
+
+		//		http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+		http.StripPrefix("/static/", http.FileServer(http.Dir("./static")))
 		return
 	}
 
@@ -50,8 +72,13 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ele.FieldByName("Response").Set(reflect.ValueOf(w))
 		ele.MethodByName(actionName).Call([]reflect.Value{})
 	} else {
-		fmt.Fprintf(w, "method %s not found", r.URL.Path)
+		fmt.Fprintf(w, "method %s not found", upath)
 	}
+}
+
+func (p *application) StaticServer(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("StaticServer 001", r.URL.Path)
+	http.StripPrefix("/static", http.FileServer(http.Dir("../static/"))).ServeHTTP(w, r)
 }
 
 func (p *application) printRoutes() {
@@ -68,8 +95,6 @@ func (p *application) Get(route string, controller interface{}) {
 func (p *application) Run(addr string) error {
 	p.printRoutes()
 	fmt.Printf("listen on %s\n", addr)
-
-	http.Handle("/static/", http.FileServer(http.Dir("../static")))
 
 	return http.ListenAndServe(addr, p)
 }

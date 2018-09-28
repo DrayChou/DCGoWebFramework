@@ -1,4 +1,4 @@
-package app
+package DCGoWebFramework
 
 import "net/http"
 

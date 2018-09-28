@@ -3,11 +3,11 @@ package controller
 import (
 	"fmt"
 
-	"../app"
+	"../../../DCGoWebFramework"
 )
 
 type SiteController struct {
-	app.Controller
+	DCGoWebFramework.Controller
 }
 
 func (p SiteController) Index() {

@@ -10,7 +10,7 @@ import (
 	//	"reflect"
 	//	"strings"
 
-	"./app"
+	"../../DCGoWebFramework"
 	"./controller"
 	"./lib"
 )
@@ -20,7 +20,7 @@ func main() {
 
 	fmt.Println("WARNING: This is an example, but not really safe.")
 
-	application := app.New()
+	application := DCGoWebFramework.New()
 	application.Get("index", &controller.IndexController{})
 	application.Get("site", &controller.SiteController{})
 	application.Run(":8888")
