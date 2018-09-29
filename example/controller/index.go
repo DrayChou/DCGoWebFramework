@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"fmt"
-
 	"../../../DCGoWebFramework"
 )
 
@@ -11,13 +9,12 @@ type IndexController struct {
 }
 
 func (p IndexController) Index() {
-	fmt.Fprintln(p.Response, p.Request.RequestURI)
-	fmt.Fprintln(p.Response, "index.index")
-
-	marrage_info := map[string]string{
-		"HanMeimei": "1",
-		"LiLei":     "0",
+	data := make(map[interface{}]interface{})
+	data["Title"] = "My Index page"
+	data["Items"] = []string{
+		"My photos",
+		"My blog",
 	}
-	DCGoWebFramework.Controller.Temp("index.index", *marrage_info)
 
+	p.Tpl("index-index", data)
 }

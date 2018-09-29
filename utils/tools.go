@@ -1,12 +1,8 @@
 package utils
 
 import (
-	//	"fmt"
-	//	"io/ioutil"
-	//	"net/http"
 	"os"
-	//	"reflect"
-	//	"strings"
+	"path/filepath"
 )
 
 // golang新版本的应该
@@ -24,9 +20,9 @@ func GetFilePath(upath string) (string, bool) {
 	basePath, _ := os.Getwd()
 
 	if upath == "favicon.ico" {
-		staticFilePath = basePath + "/static/favicon.ico"
+		staticFilePath = filepath.Join(basePath, "static", "favicon.ico")
 	} else if string([]rune(upath)[:8]) == "/static/" {
-		staticFilePath = basePath + upath
+		staticFilePath = filepath.Join(basePath, upath)
 	}
 
 	if IsPathExist(staticFilePath) {

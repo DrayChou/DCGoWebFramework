@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"./utils"
 )
@@ -14,15 +15,24 @@ type Controller struct {
 	Request  *http.Request
 }
 
-func (p Controller) Temp(path string, data map[string]string) {
+func (p Controller) Tpl(path string, data map[interface{}]interface{}) {
 	basePath, _ := os.Getwd()
-	tempPath := basePath + "/template/" + path + ".template"
 
+	tempPath := filepath.Join(basePath, "template", path+".html")
 	fmt.Println("tempPath:", tempPath)
-	if utils.IsPathExist(tempPath) {
-		fmt.Println("IsPathExist:", 1)
-		t := template.New(path)
-		//		template.Must(t.ParseFiles(tempPath))
-		t.ExecuteTemplate(p.Response, tempPath, data)
+	if !utils.IsPathExist(tempPath) {
+		return
+	}
+
+	fmt.Println("IsPathExist:", 1)
+
+	t, err := template.ParseFiles(tempPath)
+	if err != nil {
+		fmt.Println("ParseFiles", err)
+	}
+
+	err = t.Execute(p.Response, data)
+	if err != nil {
+		fmt.Println("Execute", err)
 	}
 }
