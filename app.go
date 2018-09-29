@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-
-	"./utils"
 )
 
 type application struct {
@@ -27,7 +25,7 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.URL.Path = upath
 	}
 
-	staticFilePath, err := utils.GetFilePath(upath)
+	staticFilePath, err := GetFilePath(upath)
 	if !err {
 		//匹配静态文件服务
 		body, err := ioutil.ReadFile(staticFilePath)

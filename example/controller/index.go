@@ -9,12 +9,15 @@ type IndexController struct {
 }
 
 func (p IndexController) Index() {
+
 	data := make(map[interface{}]interface{})
 	data["Title"] = "My Index page"
 	data["Items"] = []string{
 		"My photos",
 		"My blog",
 	}
+
+	p.SessionMgr.SetSessionVal(p.SessionID, "UserInfo", data)
 
 	p.Tpl("index-index", data)
 }

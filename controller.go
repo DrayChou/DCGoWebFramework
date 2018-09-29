@@ -6,13 +6,19 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-
-	"./utils"
 )
 
 type Controller struct {
-	Response http.ResponseWriter
-	Request  *http.Request
+	Response   http.ResponseWriter
+	Request    *http.Request
+	SessionMgr *SessionMgr
+	SessionID  string
+}
+
+func (p Controller) init() {
+	p.SessionMgr = NewSessionMgr("TestCookieName", 3600)
+	p.SessionID = p.SessionMgr.StartSession(p.Response, p.Request)
+	fmt.Println("SessionID:", p.SessionID)
 }
 
 func (p Controller) Tpl(path string, data map[interface{}]interface{}) {
@@ -20,7 +26,7 @@ func (p Controller) Tpl(path string, data map[interface{}]interface{}) {
 
 	tempPath := filepath.Join(basePath, "template", path+".html")
 	fmt.Println("tempPath:", tempPath)
-	if !utils.IsPathExist(tempPath) {
+	if !IsPathExist(tempPath) {
 		return
 	}
 

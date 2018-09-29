@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"fmt"
-
 	"../../../DCGoWebFramework"
 )
 

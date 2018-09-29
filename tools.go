@@ -1,4 +1,4 @@
-package utils
+package DCGoWebFramework
 
 import (
 	"os"
