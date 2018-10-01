@@ -1,19 +1,14 @@
 package main
 
 import (
-	"fmt"
-
 	"../../DCGoWebFramework"
 	"./controller"
-	"./lib"
 )
 
+var MySessionKey = "DCGoWebFramework-sid"
+
 func main() {
-	lib.Tools()
-
-	fmt.Println("WARNING: This is an example, but not really safe.")
-
-	app := DCGoWebFramework.New()
+	app := DCGoWebFramework.New(MySessionKey)
 	app.Set("index", &controller.IndexController{})
 	app.Set("site", &controller.SiteController{})
 	app.Run(":8888")

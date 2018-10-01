@@ -19,8 +19,6 @@ func (p IndexController) Index() {
 		"My blog",
 	}
 
-	p.SessionStart()
-
 	fmt.Println("MySessionID:", DCGoWebFramework.MySessionID)
 	DCGoWebFramework.MySessionMgr.SetSessionVal(DCGoWebFramework.MySessionID, "UserInfo", data)
 

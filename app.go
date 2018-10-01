@@ -8,14 +8,40 @@ import (
 	"strings"
 )
 
+var MySessionKey = "DCGoWebFramework-sid"
+var MySessionMgr *SessionMgr
+var MySessionID string
+
 type application struct {
 	routes map[string]interface{}
 }
 
-func New() *application {
+/**
+初始化对象
+ */
+func New(sessionKey string) *application {
+	if len(sessionKey) > 1 {
+		MySessionKey = sessionKey
+	}
+
+	MySessionMgr = NewSessionMgr(MySessionKey, 3600)
+
+	//fmt.Println("New", MySessionKey, MySessionMgr, MySessionID)
+
 	return &application{
 		routes: make(map[string]interface{}),
 	}
+}
+
+func (p *application) SessionStart(w http.ResponseWriter, r *http.Request) {
+	MySessionID = MySessionMgr.CheckCookieValid(w, r)
+	fmt.Println("CheckCookieValid:", MySessionID)
+
+	if len(MySessionID) < 1 {
+		//fmt.Println("StartSession:")
+		MySessionID = MySessionMgr.StartSession(w, r)
+	}
+	//fmt.Println("MySessionID:", MySessionID)
 }
 
 func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -57,6 +83,7 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	_, exist := reflect.TypeOf(route).MethodByName(actionName)
 	if exist {
+		p.SessionStart(w, r)
 		ele := reflect.ValueOf(route).Elem()
 		ele.FieldByName("Request").Set(reflect.ValueOf(r))
 		ele.FieldByName("Response").Set(reflect.ValueOf(w))
