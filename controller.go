@@ -15,8 +15,8 @@ type Controller struct {
 	SessionID  string
 }
 
-func (p Controller) init() {
-	p.SessionMgr = NewSessionMgr("TestCookieName", 3600)
+func (p Controller) SessionStart() {
+	p.SessionMgr = NewSessionMgr("DCGoWebFramework-sid", 3600)
 	p.SessionID = p.SessionMgr.StartSession(p.Response, p.Request)
 	fmt.Println("SessionID:", p.SessionID)
 }
