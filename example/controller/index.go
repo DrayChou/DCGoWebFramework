@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+
 	"../../../DCGoWebFramework"
 )
 
@@ -16,7 +18,12 @@ func (p IndexController) Index() {
 		"My photos",
 		"My blog",
 	}
+
 	p.SessionStart()
+
+	fmt.Println("MySessionID:", DCGoWebFramework.MySessionID)
+	fmt.Println("SessionID:", p.SessionID)
+
 	p.SessionMgr.SetSessionVal(p.SessionID, "UserInfo", data)
 
 	p.Tpl("index-index", data)

@@ -8,6 +8,9 @@ import (
 	"path/filepath"
 )
 
+var MySessionMgr *SessionMgr
+var MySessionID string
+
 type Controller struct {
 	Response   http.ResponseWriter
 	Request    *http.Request
@@ -16,8 +19,12 @@ type Controller struct {
 }
 
 func (p Controller) SessionStart() {
-	p.SessionMgr = NewSessionMgr("DCGoWebFramework-sid", 3600)
-	p.SessionID = p.SessionMgr.StartSession(p.Response, p.Request)
+	MySessionMgr = NewSessionMgr("DCGoWebFramework-sid", 3600)
+	MySessionID = p.SessionMgr.StartSession(p.Response, p.Request)
+
+	p.SessionMgr = MySessionMgr
+	p.SessionID = MySessionID
+
 	fmt.Println("SessionID:", p.SessionID)
 }
 
