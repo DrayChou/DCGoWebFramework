@@ -13,16 +13,18 @@ import (
 
 /*Session会话管理*/
 type SessionMgr struct {
-	mCookieName  string       //客户端cookie名称
-	mLock        sync.RWMutex //互斥(保证线程安全)
-	mMaxLifeTime int64        //垃圾回收时间
-
-	mSessions map[string]*Session //保存session的指针[sessionID] = session
+	mCookieName  string              //客户端cookie名称
+	mLock        sync.RWMutex        //互斥(保证线程安全)
+	mMaxLifeTime int64               //垃圾回收时间
+	mSessions    map[string]*Session //保存session的指针[sessionID] = session
 }
 
 //创建会话管理器(cookieName:在浏览器中cookie的名字;maxLifeTime:最长生命周期)
 func NewSessionMgr(cookieName string, maxLifeTime int64) *SessionMgr {
-	mgr := &SessionMgr{mCookieName: cookieName, mMaxLifeTime: maxLifeTime, mSessions: make(map[string]*Session)}
+	mgr := &SessionMgr{
+		mCookieName:  cookieName,
+		mMaxLifeTime: maxLifeTime,
+		mSessions:    make(map[string]*Session)}
 
 	//启动定时回收
 	go mgr.GC()
@@ -39,10 +41,18 @@ func (mgr *SessionMgr) StartSession(w http.ResponseWriter, r *http.Request) stri
 	newSessionID := url.QueryEscape(mgr.NewSessionID())
 
 	//存指针
-	var session *Session = &Session{mSessionID: newSessionID, mLastTimeAccessed: time.Now(), mValues: make(map[interface{}]interface{})}
+	var session *Session = &Session{
+		mSessionID:        newSessionID,
+		mLastTimeAccessed: time.Now(),
+		mValues:           make(map[interface{}]interface{})}
 	mgr.mSessions[newSessionID] = session
+
 	//让浏览器cookie设置过期时间
-	cookie := http.Cookie{Name: mgr.mCookieName, Value: newSessionID, Path: "/", HttpOnly: true, MaxAge: int(mgr.mMaxLifeTime)}
+	cookie := http.Cookie{
+		Name:  mgr.mCookieName,
+		Value: newSessionID,
+		Path:  "/", HttpOnly: true,
+		MaxAge: int(mgr.mMaxLifeTime)}
 	http.SetCookie(w, &cookie)
 
 	return newSessionID
@@ -61,7 +71,12 @@ func (mgr *SessionMgr) EndSession(w http.ResponseWriter, r *http.Request) {
 
 		//让浏览器cookie立刻过期
 		expiration := time.Now()
-		cookie := http.Cookie{Name: mgr.mCookieName, Path: "/", HttpOnly: true, Expires: expiration, MaxAge: -1}
+		cookie := http.Cookie{
+			Name:     mgr.mCookieName,
+			Path:     "/",
+			HttpOnly: true,
+			Expires:  expiration,
+			MaxAge:   -1}
 		http.SetCookie(w, &cookie)
 	}
 }
