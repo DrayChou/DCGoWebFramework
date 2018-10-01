@@ -40,7 +40,7 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	controllerName := "index"
 	actionName := "Index"
 	pathArr := strings.Split(upath, "/")
-	fmt.Println("path:", pathArr)
+	//	fmt.Println("path:", pathArr)
 	if len(pathArr) >= 2 && len(pathArr[1]) > 2 {
 		controllerName = strings.ToLower(pathArr[1])
 	}
@@ -60,6 +60,7 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ele := reflect.ValueOf(route).Elem()
 		ele.FieldByName("Request").Set(reflect.ValueOf(r))
 		ele.FieldByName("Response").Set(reflect.ValueOf(w))
+		//ele.MethodByName("SessionStart").Call([]reflect.Value{})
 		ele.MethodByName(actionName).Call([]reflect.Value{})
 	} else {
 		fmt.Fprintf(w, "method %s not found", upath)
@@ -73,7 +74,7 @@ func (p *application) printRoutes() {
 	}
 }
 
-func (p *application) Get(route string, controller interface{}) {
+func (p *application) Set(route string, controller interface{}) {
 	p.routes[route] = controller
 }
 

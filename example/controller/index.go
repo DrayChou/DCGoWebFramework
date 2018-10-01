@@ -16,7 +16,7 @@ func (p IndexController) Index() {
 		"My photos",
 		"My blog",
 	}
-
+	p.SessionStart()
 	p.SessionMgr.SetSessionVal(p.SessionID, "UserInfo", data)
 
 	p.Tpl("index-index", data)

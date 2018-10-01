@@ -13,8 +13,8 @@ func main() {
 
 	fmt.Println("WARNING: This is an example, but not really safe.")
 
-	application := DCGoWebFramework.New()
-	application.Get("index", &controller.IndexController{})
-	application.Get("site", &controller.SiteController{})
-	application.Run(":8888")
+	app := DCGoWebFramework.New()
+	app.Set("index", &controller.IndexController{})
+	app.Set("site", &controller.SiteController{})
+	app.Run(":8888")
 }
