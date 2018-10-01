@@ -22,9 +22,10 @@ func (p IndexController) Index() {
 	p.SessionStart()
 
 	fmt.Println("MySessionID:", DCGoWebFramework.MySessionID)
-	fmt.Println("SessionID:", p.SessionID)
+	DCGoWebFramework.MySessionMgr.SetSessionVal(DCGoWebFramework.MySessionID, "UserInfo", data)
 
-	p.SessionMgr.SetSessionVal(p.SessionID, "UserInfo", data)
+	userinfo, err := DCGoWebFramework.MySessionMgr.GetSessionVal(DCGoWebFramework.MySessionID, "UserInfo")
+	fmt.Println("UserInfo:", userinfo, err)
 
 	p.Tpl("index-index", data)
 }

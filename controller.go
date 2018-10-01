@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 )
 
+var MySessionKey = "DCGoWebFramework-sid"
 var MySessionMgr *SessionMgr
 var MySessionID string
 
@@ -19,9 +20,20 @@ type Controller struct {
 }
 
 func (p Controller) SessionStart() {
-	MySessionMgr = NewSessionMgr("DCGoWebFramework-sid", 3600)
-	MySessionID = p.SessionMgr.StartSession(p.Response, p.Request)
+	c1, err := p.Request.Cookie(MySessionKey)
+	fmt.Println("Cookie:", c1, err)
 
+	MySessionMgr = NewSessionMgr(MySessionKey, 3600)
+	MySessionID = MySessionMgr.CheckCookieValid(p.Response, p.Request)
+	fmt.Println("CheckCookieValid:", MySessionID)
+
+	if len(MySessionID) < 1 {
+		fmt.Println("StartSession:")
+		MySessionID = MySessionMgr.StartSession(p.Response, p.Request)
+	}
+	fmt.Println("MySessionID:", MySessionID)
+
+	// 这个值带不到外面去，废弃
 	p.SessionMgr = MySessionMgr
 	p.SessionID = MySessionID
 
