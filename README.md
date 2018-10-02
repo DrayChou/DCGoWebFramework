@@ -1,11 +1,11 @@
 # DCGoWebFramework
 
 ### Todo
-+ 建立项目
-+ 项目结构定型
-+ 编写路由代码
-+ 写中间件
-+ 写简单 demo
++ ~~建立项目~~
++ ~~项目结构定型~~
++ ~~编写路由代码~~
++ ~~写中间件~~
++ ~~写简单 demo~~
 
 ### Project requirements
 
