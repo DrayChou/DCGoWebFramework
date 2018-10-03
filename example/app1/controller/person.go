@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"../../../DCGoWebFramework"
+	"../../.."
 	"bytes"
 	"fmt"
 	"gopkg.in/mgo.v2"
@@ -13,7 +13,7 @@ type PersonController struct {
 	DCGoWebFramework.Controller
 }
 
-func (p PersonController) Index() {
+func (p PersonController) GET() {
 	mgodb, err1 := mgo.Dial("127.0.0.1")
 	if err1 != nil {
 		panic(err1)
@@ -48,7 +48,7 @@ func (p PersonController) Index() {
 	p.Tpl("person-index", data)
 }
 
-func (p PersonController) Add() {
+func (p PersonController) POST() {
 	fmt.Println(p.Request.Method)
 	if p.Request.Method != "POST" {
 		p.Response.WriteHeader(400)
@@ -58,13 +58,13 @@ func (p PersonController) Add() {
 	name := p.Request.FormValue("Name")
 	phone := p.Request.FormValue("Phone")
 
-	mgodb, err1 := mgo.Dial("127.0.0.1")
+	mgodb, err1 := p.App.GetDB("main")
 	if err1 != nil {
 		panic(err1)
 	}
-	defer mgodb.Close()
 
-	c := mgodb.DB("test").C("people")
+	// Collection People
+	c := mgodb.(*mgo.Session).DB("test").C("people")
 	err1 = c.Insert(&Person{Name: name, Phone: phone, Timestamp: time.Now()})
 
 	if err1 != nil {

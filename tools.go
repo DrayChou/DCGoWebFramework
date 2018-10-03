@@ -15,13 +15,13 @@ func IsPathExist(_path string) bool {
 }
 
 // 拿到静态文件的本地路径
-func GetFilePath(upath string) (string, bool) {
+func GetFilePath(upath string, staticPath string) (string, bool) {
 	staticFilePath := ""
 	basePath, _ := os.Getwd()
 
 	if upath == "favicon.ico" {
-		staticFilePath = filepath.Join(basePath, "static", "favicon.ico")
-	} else if string([]rune(upath)[:8]) == "/static/" {
+		staticFilePath = filepath.Join(basePath, staticPath, "favicon.ico")
+	} else if string([]rune(upath)[:8]) == "/"+staticPath+"/" {
 		staticFilePath = filepath.Join(basePath, upath)
 	}
 

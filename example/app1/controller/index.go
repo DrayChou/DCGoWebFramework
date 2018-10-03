@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"../../../DCGoWebFramework"
+	"../../.."
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -19,7 +19,7 @@ type Person struct {
 	Timestamp time.Time
 }
 
-func (p IndexController) Index() {
+func (p IndexController) GET() {
 	p.SessionStart()
 
 	data := make(map[interface{}]interface{})
@@ -35,17 +35,13 @@ func (p IndexController) Index() {
 	userinfo, err := p.GetSessionVal("UserInfo")
 	fmt.Println("UserInfo:", userinfo, err)
 
-	session, err1 := mgo.Dial("127.0.0.1")
+	mgodb, err1 := p.App.GetDB("main")
 	if err1 != nil {
 		panic(err1)
 	}
 
-	defer session.Close()
-
-	session.SetMode(mgo.Monotonic, true)
-
 	// Collection People
-	c := session.DB("test").C("people")
+	c := mgodb.(*mgo.Session).DB("test").C("people")
 
 	//// Index
 	//index := mgo.Index{

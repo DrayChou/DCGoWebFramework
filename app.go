@@ -2,33 +2,43 @@ package DCGoWebFramework
 
 import (
 	"fmt"
+	"github.com/akkuman/parseConfig"
+	"gopkg.in/mgo.v2"
 	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strings"
 )
 
-var MySessionKey = "DCGoWebFramework-sid"
-var MySessionMgr *SessionMgr
-
 type application struct {
-	routes map[string]interface{}
+	routes     map[string]interface{}
+	app        string
+	Config     *parseConfig.Config
+	SessionMgr *SessionMgr
 }
 
 /**
 初始化对象
  */
-func New(sessionKey string) *application {
-	if len(sessionKey) > 1 {
-		MySessionKey = sessionKey
+func New(config *parseConfig.Config) *application {
+	// 是否需要初始化 session
+	var SessionMgr *SessionMgr
+	sessionKey := config.Get("session > key").(string)
+	if sessionKey != "" {
+		lifeTime := config.Get("session > life_time").(float64)
+		if lifeTime == 0 {
+			lifeTime = 3600
+		}
+
+		SessionMgr = NewSessionMgr(sessionKey, int64(lifeTime))
 	}
 
-	MySessionMgr = NewSessionMgr(MySessionKey, 3600)
-
-	//fmt.Println("New", MySessionKey, MySessionMgr, MySessionID)
-
+	app := config.Get("app").(string)
 	return &application{
-		routes: make(map[string]interface{}),
+		routes:     make(map[string]interface{}),
+		app:        app,
+		Config:     config,
+		SessionMgr: SessionMgr,
 	}
 }
 
@@ -39,7 +49,8 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.URL.Path = upath
 	}
 
-	staticFilePath, err := GetFilePath(upath)
+	static_path := p.Config.Get("static_path").(string)
+	staticFilePath, err := GetFilePath(upath, static_path)
 	if !err {
 		//匹配静态文件服务
 		body, err := ioutil.ReadFile(staticFilePath)
@@ -74,7 +85,7 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ele := reflect.ValueOf(route).Elem()
 		ele.FieldByName("Request").Set(reflect.ValueOf(r))
 		ele.FieldByName("Response").Set(reflect.ValueOf(w))
-		//ele.MethodByName("SessionStart").Call([]reflect.Value{})
+		ele.FieldByName("App").Set(reflect.ValueOf(p))
 		ele.MethodByName(actionName).Call([]reflect.Value{})
 	} else {
 		fmt.Fprintf(w, "method %s not found", upath)
@@ -92,8 +103,49 @@ func (p *application) Set(route string, controller interface{}) {
 	p.routes[route] = controller
 }
 
-func (p *application) Run(addr string) error {
+func (p *application) GetDB(db string) (interface{}, error) {
+	var db_conf map[string]interface{}
+	db_conf = p.Config.Get("database > " + db).(map[string]interface{})
+	fmt.Println("db_conf > ", db, db_conf)
+
+	db_type := db_conf["type"].(string)
+	db_host := db_conf["host"].(string)
+	db_port := db_conf["port"].(string)
+	db_usernamet := db_conf["username"].(string)
+	db_password := db_conf["password"].(string)
+
+	switch db_type {
+	case "mongodb":
+		{
+			// mongodb://myuser:mypass@localhost:40001/mydb
+			var db_url string
+			if (len(db_usernamet) > 1) && (len(db_password) > 1) {
+				db_url += db_usernamet + ":" + db_password + "@"
+			}
+			db_url += db_host + ":" + db_port
+			mgodb, err1 := mgo.Dial(db_url)
+			if err1 != nil {
+				fmt.Println("mgo err1", db_url, mgodb, err1)
+				panic(err1)
+			}
+
+			//defer mgodb.Close()
+
+			mgodb.SetMode(mgo.Monotonic, true)
+
+			return mgodb, nil
+		}
+	}
+
+	return nil, mgo.ErrNotFound
+}
+
+func (p *application) Run() error {
 	p.printRoutes()
+
+	host := p.Config.Get("host").(string)
+	port := p.Config.Get("port").(string)
+	addr := host + ":" + port
 	fmt.Printf("listen on %s\n", addr)
 
 	return http.ListenAndServe(addr, p)
