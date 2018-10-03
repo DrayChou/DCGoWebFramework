@@ -1,0 +1,27 @@
+{
+  "app": "app2",
+  "title": "DCGoWebFramework-app2",
+  "host": "",
+  "port": "8889",
+  "static_path": "static",
+  "template_path": "template",
+  "urls": {
+    "index": "index"
+  },
+  "session": {
+    "key": "DCGoWebFramework-app2-sid",
+    "life_time": 3600
+  },
+  "database": {
+    "main": {
+      "type": "mongodb",
+      "host": "127.0.0.1",
+      "port": "27017",
+      "db": "test",
+      "username": "",
+      "password": "",
+      "usersource": ""
+    }
+  }
+}
+
