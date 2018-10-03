@@ -13,7 +13,7 @@ type PersonController struct {
 	DCGoWebFramework.Controller
 }
 
-func (p PersonController) GET() {
+func (p PersonController) Get() {
 	mgodb, err1 := mgo.Dial("127.0.0.1")
 	if err1 != nil {
 		panic(err1)
@@ -43,12 +43,12 @@ func (p PersonController) GET() {
 	data["Title"] = "My Index page"
 	data["Items"] = items
 
-	fmt.Println(data)
+	//fmt.Println(data)
 
 	p.Tpl("person-index", data)
 }
 
-func (p PersonController) POST() {
+func (p PersonController) Post() {
 	fmt.Println(p.Request.Method)
 	if p.Request.Method != "POST" {
 		p.Response.WriteHeader(400)

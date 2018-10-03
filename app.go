@@ -64,6 +64,7 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	controllerName := "index"
 	actionName := "Index"
+	methodName := strings.Title(strings.ToLower(r.Method))
 	pathArr := strings.Split(upath, "/")
 	//	fmt.Println("path:", pathArr)
 	if len(pathArr) >= 2 && len(pathArr[1]) > 2 {
@@ -72,7 +73,7 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if len(pathArr) >= 3 && len(pathArr[2]) > 2 {
 		actionName = strings.Title(pathArr[2])
 	}
-	fmt.Printf("controllerName: %s ,actionName: %s\n", controllerName, actionName)
+	fmt.Printf("controller: %s, action: %s, method: %s\n", controllerName, actionName, methodName)
 
 	route, ok := p.routes[controllerName]
 	if !ok {
@@ -80,15 +81,26 @@ func (p *application) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var action string
 	_, exist := reflect.TypeOf(route).MethodByName(actionName)
+	if exist {
+		action = actionName
+	} else {
+		_, exist = reflect.TypeOf(route).MethodByName(methodName)
+		if exist {
+			action = methodName
+		}
+	}
+
+	fmt.Printf("action: %s\n", action)
 	if exist {
 		ele := reflect.ValueOf(route).Elem()
 		ele.FieldByName("Request").Set(reflect.ValueOf(r))
 		ele.FieldByName("Response").Set(reflect.ValueOf(w))
 		ele.FieldByName("App").Set(reflect.ValueOf(p))
-		ele.MethodByName(actionName).Call([]reflect.Value{})
+		ele.MethodByName(action).Call([]reflect.Value{})
 	} else {
-		fmt.Fprintf(w, "method %s not found", upath)
+		fmt.Fprintf(w, "methodName %s not found", upath)
 	}
 }
 

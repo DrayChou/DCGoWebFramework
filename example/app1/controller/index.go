@@ -19,7 +19,7 @@ type Person struct {
 	Timestamp time.Time
 }
 
-func (p IndexController) GET() {
+func (p IndexController) Get() {
 	p.SessionStart()
 
 	data := make(map[interface{}]interface{})
