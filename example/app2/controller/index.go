@@ -20,7 +20,7 @@ type Person struct {
 	Timestamp time.Time
 }
 
-func (p IndexController) GET() {
+func (p IndexController) Get() {
 	mgodb, err1 := p.App.GetDB("main")
 	if err1 != nil {
 		panic(err1)
