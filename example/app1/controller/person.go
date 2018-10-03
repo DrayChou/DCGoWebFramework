@@ -14,15 +14,13 @@ type PersonController struct {
 }
 
 func (p PersonController) Get() {
-	mgodb, err1 := mgo.Dial("127.0.0.1")
+	mgodb, err1 := p.App.GetDB("main")
 	if err1 != nil {
 		panic(err1)
 	}
-	defer mgodb.Close()
 
-	mgodb.SetMode(mgo.Monotonic, true)
 	// Collection People
-	c := mgodb.DB("test").C("people")
+	c := mgodb.(*mgo.Session).DB("test").C("people")
 
 	// Query All
 	var results []Person
@@ -35,7 +33,7 @@ func (p PersonController) Get() {
 	items := make(map[interface{}]interface{})
 	fmt.Println(results)
 	for i := range results {
-		fmt.Println(results[i])
+		//fmt.Println(results[i])
 		items[i] = results[i]
 	}
 
