@@ -5,13 +5,22 @@
     <title>{{.Title}}</title>
     </head>
     <body>
+        <div>
+            <form action="add" method="post">
+                <input type="text" name="Name">
+                <input type="text" name="Phone">
+                <input type="submit" >
+            </form>
+        </div>
         <div class="item-list">
             {{range .Items}}
                 <div>
                     <table>
                         <tbody>
                             <tr>
-                                {{/*<td>{{ .ID }}</td>*/}}
+                                <td>
+                                    <a href="/person/{{ .ID.Hex }}">{{ .ID.Hex }}</a>
+                                </td>
                                 <td>{{ .Name }}</td>
                                 <td>{{ .Phone }}</td>
                                 <td>{{ .Timestamp }}</td>
@@ -22,13 +31,6 @@
             {{else}}
                 <div><strong>no rows</strong></div>
             {{end}}
-        </div>
-        <div>
-            <form action="add" method="post">
-                <input type="text" name="Name">
-                <input type="text" name="Phone">
-                <input type="submit" >
-            </form>
         </div>
     </body>
 </html>
