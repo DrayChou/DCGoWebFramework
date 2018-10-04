@@ -5,9 +5,6 @@
   "port": "8888",
   "static_path": "static",
   "template_path": "template",
-  "urls": {
-    "index": "index"
-  },
   "session": {
     "key": "DCGoWebFramework-app1--sid",
     "life_time": 3600
